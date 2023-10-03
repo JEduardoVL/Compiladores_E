@@ -3,6 +3,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer.Token;
+
 public class Scanner {
 
     private static final Map<String, TipoToken> palabrasReservadas;
@@ -63,6 +65,86 @@ public class Scanner {
 
                     }
                     break;
+
+                case 1:
+                    lexema +=c;
+                    if(c != '>' && c == '='){
+                        Token t = new Token(TipoToken.GREATER_EQUAL, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema ="";
+                    }
+                    else {
+                        Token t = new Token(TipoToken.GREATER, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema = "";
+                    }
+                break; 
+
+                case 2:
+                    lexema += c;
+                    if(c != '='){
+                        Token t = new Token(TipoToken.GREATER_EQUAL, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema ="";
+                    }
+                break;
+
+                case 3:
+
+                break;
+
+                case 4:
+                    lexema +=c;
+                    if(c != '<' && c == '='){
+                        Token t = new Token(TipoToken.LESS_EQUAL, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema ="";
+                    }
+                    else{
+                        Token t = new Token(TipoToken.LESS, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema ="";
+                    }
+                break;
+
+                case 7:
+                    lexema +=c;
+                    if(c == '='){
+                        Token t = new Token(TipoToken.EQUAL_EQUAL, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema ="";
+                    }
+                    else{
+                        Token t = new Token(TipoToken.EQUAL, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema = "";
+                    }
+                break;
+
+                case 8:
+
+                break;
+
+                case 10:
+                    lexema +=c;
+                    if(c != '!' && c == 'c'){
+                        Token t = new Token(TipoToken.BANG_EQUAL, lexema);
+                        tokens.add(t);
+                    }
+                    else{
+                        Token t = new Token(TipoToken.BANG, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                break;
 
                 case 13:
                     if(Character.isLetterOrDigit(c)){
