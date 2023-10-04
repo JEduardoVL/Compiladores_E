@@ -51,19 +51,32 @@ public class Scanner {
                     else if(Character.isDigit(c)){
                         estado = 15;
                         lexema += c;
-
-                        /*while(Character.isDigit(c)){
-                            lexema += c;
-                            i++;
-                            c = source.charAt(i);
-                        }
-                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
-                        lexema = "";
-                        estado = 0;
-                        tokens.add(t);
-                        */
-
                     }
+                    else if(c == '"'){ 
+                        estado =24;
+                        lexema += c;
+                    }
+                    else if(c== '>'){
+                        estado =1;
+                        lexema += c;
+                    }
+                    else if(c=='<'){
+                        estado =4;
+                        lexema +=c;
+                    }
+                    else if(c == '='){
+                        estado = 7;
+                        lexema += c;
+                    }
+                    else if(c == '!'){
+                        estado = 10;
+                        lexema += c;
+                    }
+                    else if(c == '/'){
+                        estado = 26;
+                        lexema += c;  
+                    }  // tokens de un solo caracter
+
                     break;
 
                     case 1:
