@@ -3,8 +3,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer.Token;
-
 public class Scanner {
 
     private static final Map<String, TipoToken> palabrasReservadas;
@@ -90,6 +88,7 @@ public class Scanner {
                         tokens.add(t);
                         estado = 0;
                         lexema = ""; 
+                        i --;
                     }
                     break;
                /*  case 1:
@@ -141,6 +140,7 @@ public class Scanner {
                     tokens.add(t);
                     estado = 0;
                     lexema = ""; 
+                    i--;
                 }
                 break;            
                 /*case 7:
@@ -168,6 +168,7 @@ public class Scanner {
                         tokens.add(t);
                         estado = 0;
                         lexema = ""; 
+                        i--;
                     }
                     break;
                 case 9:
@@ -216,7 +217,8 @@ public class Scanner {
                         tokens.add(t);
                         estado = 0;
                         lexema = ""; 
-                    }
+                        i--;
+                    }   
                     break;
                 case 15:
                     if (Character.isDigit(c)) {
@@ -233,6 +235,7 @@ public class Scanner {
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
+                        i--;
                     }
                     break;
                 case 16:
@@ -255,6 +258,7 @@ public class Scanner {
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
+                        i--;
                     }
                     break;
                 case 18:
@@ -291,10 +295,9 @@ public class Scanner {
                 case 24:
                     lexema += c;
                     if (c == '"') {
-                        Token t = new Token(TipoToken.STRING, lexema);
-                        tokens.add(t);
+                        tokens.add(new Token(TipoToken.STRING, lexema));
                         estado = 0;
-                        lexema = ""; 
+                        lexema = "";
                     }else if (c == '\n') {
                         throw new Exception("Error en el análisis léxico: Salto de línea no permitido dentro de una cadena.");
                     }
@@ -303,33 +306,27 @@ public class Scanner {
                     lexema += c;
                     if(c=='*'){
                         estado = 27;
-                        lexema += c;
                     }
                     else if(c == '/'){
                         estado = 30;
-                        lexema += c;
                     }else{
                         Token t = new Token(TipoToken.SLASH,lexema);
                         tokens.add(t);
                         estado = 0;
                         lexema = ""; 
+                        i--;
                     }
                 break;
                 case 27:
                     lexema += c;
                     if(c=='*'){
                         estado = 28;
-                        lexema += c;
                     }else {
-                        estado = 27;
-                        lexema += c;
                     }
                 break;
                 case 28:
                     lexema +=c;
                     if(c=='*'){
-                        estado =28;
-                        lexema += c;
                     }
                     else if(c == '/'){
                         estado = 0;
@@ -345,8 +342,7 @@ public class Scanner {
                         estado= 0;
                         lexema += c;
                     }else{
-                        estado = 30;
-                        lexema += c;
+                        
                     }
                 break;
             }
@@ -360,9 +356,5 @@ public class Scanner {
 
         return tokens;
     }
-    private void addToken(TipoToken tipo, String lexema) {
-        Token t = new Token(tipo, lexema);
-        tokens.add(t);
-        lexema = "";
-    }
+    
 }
