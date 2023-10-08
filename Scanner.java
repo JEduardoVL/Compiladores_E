@@ -43,7 +43,7 @@ public class Scanner {
             switch (estado){
                 case 0:
                     if(Character.isLetter(c)){
-                        estado = 13;
+                        estado = 9;
                         lexema += c;
                     }
                     else if(Character.isDigit(c)){
@@ -74,7 +74,7 @@ public class Scanner {
                         estado = 26;
                         lexema += c;  
                     }
-                    else if(c == '('){       
+                    else if(c == '('){       // tokens de un solo caracter
                         addToken(TipoToken.LEFT_PAREN, lexema);
                         estado = 0;
                         lexema = "";
@@ -94,8 +94,7 @@ public class Scanner {
                         addToken(TipoToken.COMMA, lexema);
                         estado = 0;
                         lexema = "";
-                    }
-                    else if(c == '.'){       
+                    }else if(c == '.'){       
                         addToken(TipoToken.DOT, lexema);
                         estado = 0;
                         lexema = "";
@@ -107,6 +106,7 @@ public class Scanner {
                         addToken(TipoToken.PLUS, lexema);
                         estado = 0;
                         lexema = "";
+                      
                     }else if(c == ';'){       
                         addToken(TipoToken.SEMICOLON, lexema);
                         estado = 0;
@@ -115,8 +115,7 @@ public class Scanner {
                         addToken(TipoToken.STAR, lexema);
                         estado = 0;
                         lexema = "";
-                    }// tokens de un solo caracter
-
+                    }
                     break;
 
                     case 1:
@@ -270,13 +269,14 @@ public class Scanner {
                         i--; // Retrocede un paso para analizar el siguiente caracter
                     }
                     break;
-                case 24:
+                    case 24:
                     lexema += c;
                     if (c == '"') {
-                        tokens.add(new Token(TipoToken.STRING, lexema));
+                        String cadenaSinComillas = lexema.substring(1, lexema.length() - 1);
+                        tokens.add(new Token(TipoToken.STRING, lexema, cadenaSinComillas));
                         estado = 0;
                         lexema = "";
-                    }else if (c == '\n') {
+                    } else if (c == '\n') {
                         throw new Exception("Error en el análisis léxico: Salto de línea no permitido dentro de una cadena.");
                     }
                     break;
@@ -311,9 +311,7 @@ public class Scanner {
                         lexema = "";
                     }else{
                         estado = 27;
-                        lexema += c;
                     }
-
                 break;
                 case 30:
                     if(c == '\n'){
@@ -339,6 +337,7 @@ public class Scanner {
         Token t = new Token(tipo, lexema);
         tokens.add(t);
         lexema = "";
+        
     }
     
 }
