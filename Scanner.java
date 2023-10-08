@@ -280,10 +280,13 @@ public class Scanner {
                 case 24:
                     lexema += c;
                     if (c == '"') {
-                        tokens.add(new Token(TipoToken.STRING, lexema));
+                        // Extraer la cadena sin las comillas
+                        String cadenaSinComillas = lexema.substring(1, lexema.length() - 1);
+                        // Crear un nuevo token con la cadena como literal
+                        tokens.add(new Token(TipoToken.STRING, lexema, cadenaSinComillas));
                         estado = 0;
-                        lexema = ""; 
-                    }else if (c == '\n') {
+                        lexema = "";
+                    } else if (c == '\n') {
                         throw new Exception("Error en el análisis léxico: Salto de línea no permitido dentro de una cadena.");
                     }
                     break;
