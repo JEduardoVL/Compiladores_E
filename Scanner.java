@@ -115,7 +115,7 @@ public class Scanner {
                         estado = 0;
                         lexema = ""; 
                     }else if(c == ';'){  
-                        Token t = new Token(TipoToken.SEMICOLON, lexema);
+                        Token t = new Token(TipoToken.SEMICOLON, lexema, lexema);
                         tokens.add(t);
                         estado = 0;
                         lexema = ""; 
