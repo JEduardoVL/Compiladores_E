@@ -1,5 +1,3 @@
-primer avance Proyecto Final:
-
 import java.util.List;
 
 
