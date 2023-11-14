@@ -260,23 +260,17 @@ public class ASDR implements Program{
     }
 
     private void While_Stmt(){
-        if(hayErrores)
-        return;
-        if(preanalisis.tipo == TipoToken.WHILE){
-            match(TipoToken.WHILE);
-            if(preanalisis.tipo == TipoToken.LEFT_PAREN){
-                match(TipoToken.LEFT_PAREN);
-                Expression();
-                if(preanalisis.tipo == TipoToken.RIGHT_PAREN){
-                    match(TipoToken.RIGHT_PAREN);
-                    Statement();
-                }
-            }
-        }else{
-            hayErrores = true;
-            System.out.println("Error de Análisis");
-        }
+
     }
+
+
+    
+
+    
+
+    
+
+    
 
     private void Block(){
         if(hayErrores)
@@ -466,6 +460,9 @@ public class ASDR implements Program{
         }else{
             // vacio
         }
+    }
+
+    private void Arguments_Opc() {
     }
 
     private void Primary(){
