@@ -1,6 +1,7 @@
 import java.util.List;
 
 
+
 public class ASDR implements Program{
 
     private int i = 0;
@@ -60,10 +61,15 @@ public class ASDR implements Program{
     private void Var_Decl(){
         if(hayErrores)
         return;
-        if(preanalisis.tipo == TipoToken.VAR && preanalisis.tipo== TipoToken.IDENTIFIER){
+        if(preanalisis.tipo == TipoToken.VAR ){
             match(TipoToken.VAR);
-            match(TipoToken.IDENTIFIER);
-            Var_Init();
+            if(preanalisis.tipo == TipoToken.IDENTIFIER){
+                match(TipoToken.IDENTIFIER);
+                Var_Init();
+                if(preanalisis.tipo == TipoToken.SEMICOLON){
+                    match(TipoToken.SEMICOLON);
+                }
+            }
         }else{
             hayErrores = true;
             System.out.println("Error de Análisis");
@@ -76,6 +82,8 @@ public class ASDR implements Program{
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
             Expression();
+        }else{
+            // vacio
         }
     }
 // Sentencias
@@ -84,39 +92,31 @@ public class ASDR implements Program{
         if(hayErrores)
         return;
         if(preanalisis.tipo == TipoToken.FOR){
-           // match(TipoToken.FOR);
             For_Stmt();
         }else if(preanalisis.tipo == TipoToken.IF){
-         //   match(TipoToken.IF);
             If_Stmt();
         }else if(preanalisis.tipo == TipoToken.PRINT){
-          //  match(TipoToken.PRINT);
             Print_Stmt();
         }else if(preanalisis.tipo == TipoToken.RETURN){
-          //  match(TipoToken.RETURN);
             Return_Stmt();
         }else if(preanalisis.tipo == TipoToken.WHILE){
-         //   match(TipoToken.WHILE);
             While_Stmt();
         }else if(preanalisis.tipo == TipoToken.LEFT_BRACE){
-           // match(TipoToken.LEFT_BRACE);
             Block();
         }else if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
             Expr_Stmt();
-        }else{
+        }/*else{
             hayErrores = true;
             System.out.println("Error de Análisis");
-        }
+        }*/
     }
 
     private void Expr_Stmt(){
         if(hayErrores)
         return;
-        if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
-            Expr_Stmt();
-            if(preanalisis.tipo ==TipoToken.SEMICOLON){
-                match(TipoToken.SEMICOLON);
-            }
+        Expression();
+        if(preanalisis.tipo == TipoToken.SEMICOLON){
+            match(TipoToken.SEMICOLON);
         }else{
             hayErrores = true;
             System.out.println("Error de Análisis");
@@ -148,12 +148,12 @@ public class ASDR implements Program{
     private void For_Stmt_1(){
         if(hayErrores)
         return;
-        if(preanalisis.tipo == TipoToken.SEMICOLON){
-            match(TipoToken.SEMICOLON);
-        }else if(preanalisis.tipo == TipoToken.VAR){
-            Var_Decl();
-        }else if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
+       if(preanalisis.tipo == TipoToken.VAR){
+        Var_Decl();
+       }else if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
             Expr_Stmt();
+        }else if(preanalisis.tipo == TipoToken.SEMICOLON){
+            match(TipoToken.SEMICOLON);
         }else{
             hayErrores = true;
             System.out.println("Error de Análisis");
@@ -181,8 +181,7 @@ public class ASDR implements Program{
         return;
         if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
             Expr_Stmt();
-        }
-        else{
+        }else{
            // vacio
         }
     }
@@ -260,17 +259,23 @@ public class ASDR implements Program{
     }
 
     private void While_Stmt(){
-
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.WHILE){
+            match(TipoToken.WHILE);
+            if(preanalisis.tipo == TipoToken.LEFT_PAREN){
+                match(TipoToken.LEFT_PAREN);
+                Expression();
+                if(preanalisis.tipo == TipoToken.RIGHT_PAREN){
+                    match(TipoToken.RIGHT_PAREN);
+                    Statement();
+                }
+            }
+        }else{
+            hayErrores = true;
+            System.out.println("Error de Análisis");
+        }
     }
-
-
-    
-
-    
-
-    
-
-    
 
     private void Block(){
         if(hayErrores)
@@ -322,7 +327,7 @@ public class ASDR implements Program{
             Equality();
             Logic_And_2();
         }else{
-
+            // vacio
         }
     }
 
@@ -457,12 +462,18 @@ public class ASDR implements Program{
                 match(TipoToken.RIGHT_PAREN);
                 Call_2();
             }
-        }else{
+        }
+        // duda
+        else if(preanalisis.tipo == TipoToken.DOT){
+            match(TipoToken.DOT);
+            if(preanalisis.tipo == TipoToken.IDENTIFIER){
+                match(TipoToken.IDENTIFIER);
+                Call_2();
+            }
+        }
+        else{
             // vacio
         }
-    }
-
-    private void Arguments_Opc() {
     }
 
     private void Primary(){
@@ -504,29 +515,95 @@ public class ASDR implements Program{
         }
     }
 
-    
-
-    private void Assignment_Opc(){
-
-    }
-    
-
-    
-
-    
-
-    
-
-    
-   
     private void Function(){
-
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            if(preanalisis.tipo == TipoToken.LEFT_PAREN){
+                match(TipoToken.LEFT_PAREN);
+                Parameters_Opc();
+                if(preanalisis.tipo == TipoToken.RIGHT_PAREN){
+                    match(TipoToken.RIGHT_PAREN);
+                    Block();
+                }
+            }
+        }else{
+            hayErrores = true;
+            System.out.println("Error de Análisis");
+        }
     }
 
-    
+    private void Parameters_Opc(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            Parameters();
+        }else{
+            // vacio
+        }
+    }
 
+    private void Parameters(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            Parameters_2();
+        }else{
+            hayErrores = true;
+            System.out.println("Error de Análisis");
+        }
+    }
     
+    private void Parameters_2(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            if(preanalisis.tipo == TipoToken.IDENTIFIER){
+                match(TipoToken.IDENTIFIER);
+                Parameters_2();
+            }
+        }else{
+            // vacio
+        }
+    }
+    
+    private void Assignment_Opc(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.EQUAL){
+            match(TipoToken.EQUAL);
+            Expression();
+        }else{
+            // vacio
+        }
+    }
 
+    private void Arguments_Opc(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.BANG || preanalisis.tipo == TipoToken.MINUS || preanalisis.tipo == TipoToken.TRUE || preanalisis.tipo == TipoToken.FALSE || preanalisis.tipo == TipoToken.NULL || preanalisis.tipo == TipoToken.NUMBER || preanalisis.tipo == TipoToken.STRING || preanalisis.tipo == TipoToken.IDENTIFIER){
+            Expression(); // duda
+            Arguments();
+        }else{
+            // vacio
+        }
+    }
+
+    private void Arguments(){
+        if(hayErrores)
+        return;
+        if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            Expression();
+            Arguments();
+        }else{
+            // vacio
+        }
+    }
 
     private void match(TipoToken tt){
         if(preanalisis.tipo == tt){
@@ -539,7 +616,4 @@ public class ASDR implements Program{
         }
 
     }
-
- 
-
 }
