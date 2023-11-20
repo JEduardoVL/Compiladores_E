@@ -10,62 +10,54 @@ public class Interprete {
 
     static boolean existenErrores = false;
 
-    public static void main(String[] args) {
-        if (args.length > 1) {
-            System.out.println("Uso correcto: interprete [archivo.txt]");
+    public static void main(String[] args) throws IOException {
+        if(args.length > 1) {
+            System.out.println("Uso correcto: interprete [script]");
+
+            // Convención defininida en el archivo "system.h" de UNIX
             System.exit(64);
-        } else if (args.length == 1) {
+        } else if(args.length == 1){
             ejecutarArchivo(args[0]);
-        } else {
+        } else{
             ejecutarPrompt();
         }
     }
 
-    private static void ejecutarArchivo(String path) {
-        try {
-            // Lee el contenido del archivo y ejecuta el programa
-            String contenido = new String(Files.readAllBytes(Paths.get(path)), Charset.defaultCharset());
-            ejecutar(contenido);
+    private static void ejecutarArchivo(String path) throws IOException {
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        ejecutar(new String(bytes, Charset.defaultCharset()));
 
-            // Se indica que existe un error si los hay
-            if (existenErrores) System.exit(65);
-        } catch (IOException e) {
-            System.err.println("Error al leer el archivo: " + e.getMessage());
-            System.exit(66);
-        }
+        // Se indica que existe un error
+        if(existenErrores) System.exit(65);
     }
 
-    private static void ejecutarPrompt() {
+    private static void ejecutarPrompt() throws IOException{
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for (;;) {
+        for(;;){
             System.out.print(">>> ");
-            try {
-                String linea = reader.readLine();
-                if (linea == null) break; // Presionar Ctrl + D
-                ejecutar(linea);
-                existenErrores = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            String linea = reader.readLine();
+            if(linea == null) break; // Presionar Ctrl + D
+            ejecutar(linea);
+            existenErrores = false;
         }
     }
 
-    private static void ejecutar(String source) {
+    private static void ejecutar(String source){
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = null;
         try {
-            // Resto del código para ejecutar el programa
-            Scanner scanner = new Scanner(source);
-            List<Token> tokens = scanner.scan();
-
-            for (Token token : tokens) {
-                System.out.println(token);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            tokens = scanner.scan();
+        } catch (Exception e) {
+            System.err.println("Error durante el análisis léxico: " + e.getMessage());
+            return;
         }
+        
+        // El resto de tu código sigue aquí
+        Program program = new ASDR(tokens);
+        program.progra();
     }
-
 
     /*
     El método error se puede usar desde las distintas clases
@@ -76,9 +68,9 @@ public class Interprete {
         reportar(linea, "", mensaje);
     }
 
-    private static void reportar(int linea, String posicion, String mensaje){
+    private static void reportar(int linea, String donde, String mensaje){
         System.err.println(
-                "[linea " + linea + "] Error " + posicion + ": " + mensaje
+                "[linea " + linea + "] Error " + donde + ": " + mensaje
         );
         existenErrores = true;
     }
