@@ -76,8 +76,136 @@ public class ASDR implements Program{
     }
 
     //////////////////////////////////// SENTENCIAS
+    private Statement statement() throws ParserException {
+        switch (preanalisis.getTipo()) {
+            case IF:
+                return if_stmt(); 
+            case FOR:
+                return for_stmt(); 
+            case PRINT:
+                return print_stmt(); 
+            case RETURN:
+                return return_stmt(); 
+            case WHILE:
+                return while_stmt(); 
+            case LEFT_BRACE:
+                return block(); 
+            default:
+                throw new ParserException("Declaracion no valida. ");
+        }
+    }
 
+    private Statement expr_stmt() throws ParserException {
+        Expression expr = expression();
+        match(TipoToken.SEMICOLON);
+        return new StmtExpression(expr);
+    }
 
+    private Statement for_stmt() throws ParserException {
+        match(TipoToken.FOR);
+        match(TipoToken.LEFT_PAREN);
+        Statement initializer = for_stmt_1();
+        Expression condition = for_stmt_2();
+        Expression increment = for_stmt_3();
+        match(TipoToken.RIGHT_PAREN);
+        Statement body = statement();
+        return new StmtFor(initializer, condition, increment, body); 
+    }
+    
+    private Statement for_stmt_1() throws ParserException {
+        if (preanalisis.getTipo() == TipoToken.VAR) {
+            return var_decl(); 
+        } else if (preanalisis.getTipo() != TipoToken.SEMICOLON) {
+            return expr_stmt();
+        } else {
+            match(TipoToken.SEMICOLON);
+            return null; 
+        }
+    }
+    
+    private Expression for_stmt_2() throws ParserException {
+        if (preanalisis.getTipo() != TipoToken.SEMICOLON) {
+            Expression condition = expression();
+            match(TipoToken.SEMICOLON);
+            return condition;
+        } else {
+            match(TipoToken.SEMICOLON);
+            return null; 
+        }
+    }
+    
+    private Expression for_stmt_3() throws ParserException {
+        if (preanalisis.getTipo() != TipoToken.RIGHT_PAREN) {
+            return expression(); 
+        } else {
+            return null; // Sin incremento
+        }
+    }
+
+    private Statement if_stmt() throws ParserException {
+        match(TipoToken.IF);
+        match(TipoToken.LEFT_PAREN);
+        Expression condition = expression();
+        match(TipoToken.RIGHT_PAREN);
+        Statement thenBranch = statement();
+        Statement elseBranch = else_statement(); 
+        return new StmtIf(condition, thenBranch, elseBranch);
+    }
+
+    private Statement else_statement() throws ParserException {
+        if (preanalisis.getTipo() == TipoToken.ELSE) {
+            match(TipoToken.ELSE);
+            return statement();
+        }
+        return null; // E
+    }
+
+    private Statement print_stmt() throws ParserException {
+        match(TipoToken.PRINT);
+        Expression value = expression();
+        match(TipoToken.SEMICOLON);
+        return new StmtPrint(value);
+    }
+
+    private Statement return_stmt() throws ParserException {
+        match(TipoToken.RETURN);
+        Expression value = return_exp_opc(); 
+        match(TipoToken.SEMICOLON);
+        return new StmtReturn(value);
+    }
+
+    private Expression return_exp_opc() throws ParserException {
+        if (preanalisis.getTipo() != TipoToken.SEMICOLON) {
+            return expression();
+        }
+        return null; // E
+    }
+
+    private Statement while_stmt() throws ParserException {
+        match(TipoToken.WHILE);
+        match(TipoToken.LEFT_PAREN);
+        Expression condition = expression();
+        match(TipoToken.RIGHT_PAREN);
+        Statement body = statement();
+        return new StmtLoop(condition, body);
+    }
+
+    private StmtBlock block() throws ParserException {
+        match(TipoToken.LEFT_BRACE);
+        List<Statement> statements = new ArrayList<>();
+        while (!check(TipoToken.RIGHT_BRACE) && !check(TipoToken.EOF)) {
+            statements.add(declaration());
+        }
+        match(TipoToken.RIGHT_BRACE);
+        return new StmtBlock(statements);
+    }
+
+    private boolean check(TipoToken tipo) {
+        if (preanalisis.getTipo() == tipo) {
+            return true;
+        }
+        return false;
+    }
     //////////////////////////////Expresiones
 
     private Expression expression() throws ParserException{
