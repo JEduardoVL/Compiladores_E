@@ -401,7 +401,64 @@ public class ASDR implements Program{
         return null;
     }
 
-///////////////////////////Otras 
+    ///////////////////////////Otras 
+    private Statement function() throws ParserException {
+        match(TipoToken.IDENTIFIER);
+        Token functionName = previous();
+        match(TipoToken.LEFT_PAREN);
+        List<Token> parameters = parameters_opc(); 
+        match(TipoToken.RIGHT_PAREN);
+        StmtBlock body = block(); 
+        return new StmtFunction(functionName, parameters, body); 
+    }
+    
+    private List<Token> parameters_opc() throws ParserException {
+        if (preanalisis.getTipo() != TipoToken.RIGHT_PAREN) {
+            return parameters();
+        }
+        return Collections.emptyList(); // E
+    }
+    
+    private List<Token> parameters() throws ParserException {
+        List<Token> params = new ArrayList<>();
+        if (preanalisis.getTipo() == TipoToken.IDENTIFIER) {
+            do {
+                match(TipoToken.IDENTIFIER);
+                params.add(previous());
+                params = parameters_2(params);
+            } while (preanalisis.getTipo() == TipoToken.COMMA);
+        }
+        return params;
+    }
+    
+    private List<Token> parameters_2(List<Token> existingParams) throws ParserException {
+        while (preanalisis.getTipo() == TipoToken.COMMA) {
+            match(TipoToken.COMMA);
+            match(TipoToken.IDENTIFIER);
+            existingParams.add(previous());
+        }
+        return existingParams;
+    }
+    
+    private List<Expression> arguments_opc() throws ParserException {
+        if (preanalisis.getTipo() != TipoToken.RIGHT_PAREN) {
+            return arguments();
+        }
+        return Collections.emptyList(); // E
+    }
+    
+    private List<Expression> arguments() throws ParserException {
+        List<Expression> args = new ArrayList<>();
+        if (preanalisis.getTipo() != TipoToken.RIGHT_PAREN) {
+            do {
+                args.add(expression());
+                if (preanalisis.getTipo() == TipoToken.COMMA) {
+                    match(TipoToken.COMMA);
+                }
+            } while (preanalisis.getTipo() != TipoToken.RIGHT_PAREN);
+        }
+        return args;
+    }
 
 
 
